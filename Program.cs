@@ -21,32 +21,18 @@ namespace FirstBankOfSuncoast
             List<Transaction> transactions = new List<Transaction>()
             {
               new Transaction("deposit", 100),
-              new Transaction("withdrawl", 80)
+              new Transaction("withdrawal", 80)
 
              };
 
-            // Creates a stream reader to get information from our file
-
-
-            // var fileReader = new StreamReader(CHECKING_ACCOUNT);
-
-
-            // if (File.Exists(CHECKING_ACCOUNT))
-            // {
-            //     fileReader = new StreamReader(CHECKING_ACCOUNT);
+         //TODO : Read file and load data
+            // using (var fileReader = new StreamReader(CHECKING_ACCOUNT))
+            // using (var csvReader = new CsvReader(fileReader, CultureInfo.InvariantCulture)){
+            //     //csvReader.Configuration.HeaderValidated = null;
+            //     List<Transaction> checkingTransactions = csvReader.GetRecords<Transaction>().ToList();
+            //     Console.WriteLine($"{checkingTransactions[0].Action} , {checkingTransactions[0].Amount} ");
             // }
-            // else
-
-
-            // var csvReader = new CsvReader(fileReader, CultureInfo.InvariantCulture);
-            // List<Transaction> checkingTranscations = csvReader.GetRecords<Transaction>().ToList();
-
-            // foreach (Transaction item in checkingTransactions)
-            // {
-            //     Console.WriteLine($"{item.Action} , {item.Amount} ");
-
-            // }
-
+            //fileReader.Close();
 
 
             bool keepGoing = true;
@@ -54,29 +40,26 @@ namespace FirstBankOfSuncoast
             string account = "";
 
 
-            while (keepGoing)
-            {
+            while (keepGoing) {
                 Console.Write("Would you like to access your (C)hecking or (S)avings Account? ");
                 userInput = Console.ReadLine().ToUpper();
 
-                if (userInput == "C")
-                {
+                if (userInput == "C") {
                     account = CHECKING_ACCOUNT;
-                }
-                else if (userInput == "S")
-                {
+                } else if (userInput == "S") {
                     account = SAVINGS_ACCOUNT;
-                }
-                else
-                {
+                } else{
                     Console.WriteLine("Invalid input, bye");
                     return;
                 }
 
+
+// to do load transaction into memory
+
                 Console.Write("Would you like to (D)eposit, (W)ithdraw, or check (B)alance? ");
                 userInput = Console.ReadLine().ToUpper();
 
-                int accountTotal = CalculateTotal(transcations);
+                int accountTotal = CalculateTotal(transactions);
                 int amountToTransact = 0;
 
 
@@ -97,7 +80,7 @@ namespace FirstBankOfSuncoast
                     Transaction newTransaction = new Transaction("deposit", amountToTransact);
                     transactions.Add(newTransaction);
 
-                    accountTotal = CalculateTotal(transcations);
+                    accountTotal = CalculateTotal(transactions);
                     Console.WriteLine($"Your new total is {accountTotal}");
 
                 }
@@ -122,10 +105,10 @@ namespace FirstBankOfSuncoast
 
                     }
 
-                    Transaction newTransaction = new Transaction("withdraw", amountToTransact);
+                    Transaction newTransaction = new Transaction("withdrawal", amountToTransact);
                     transactions.Add(newTransaction);
 
-                    accountTotal = CalculateTotal(transcations);
+                    accountTotal = CalculateTotal(transactions);
                     Console.WriteLine($"Your new total is {accountTotal}");
                 }
                 else if (userInput == "B")
@@ -160,9 +143,9 @@ namespace FirstBankOfSuncoast
                 }
             }
 
-
         }
-        public static int CalculateTotal(List<Transaction> transcations)
+
+        public static int CalculateTotal(List<Transaction> transactions)
         {
             int sum = 0;
 
@@ -172,7 +155,7 @@ namespace FirstBankOfSuncoast
                 {
                     sum += item.Amount;
                 }
-                else if (item.Action == "withdraw")
+                else if (item.Action == "withdrawal")
                 {
                     sum -= item.Amount;
                 }
