@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
+
 
 
 namespace FirstBankOfSuncoast
@@ -25,15 +28,6 @@ namespace FirstBankOfSuncoast
 
              };
 
-         //TODO : Read file and load data
-            // using (var fileReader = new StreamReader(CHECKING_ACCOUNT))
-            // using (var csvReader = new CsvReader(fileReader, CultureInfo.InvariantCulture)){
-            //     //csvReader.Configuration.HeaderValidated = null;
-            //     List<Transaction> checkingTransactions = csvReader.GetRecords<Transaction>().ToList();
-            //     Console.WriteLine($"{checkingTransactions[0].Action} , {checkingTransactions[0].Amount} ");
-            // }
-            //fileReader.Close();
-
 
             bool keepGoing = true;
             string userInput = "";
@@ -44,17 +38,24 @@ namespace FirstBankOfSuncoast
                 Console.Write("Would you like to access your (C)hecking or (S)avings Account? ");
                 userInput = Console.ReadLine().ToUpper();
 
-                if (userInput == "C") {
+                if (userInput == "C") 
+                {
                     account = CHECKING_ACCOUNT;
-                } else if (userInput == "S") {
+                } else if (userInput == "S") 
+                {
                     account = SAVINGS_ACCOUNT;
-                } else{
+                } 
+                else
+                {
                     Console.WriteLine("Invalid input, bye");
                     return;
                 }
 
-
-// to do load transaction into memory
+                using (var fileReader = new StreamReader(account))
+                using (var csvReader = new CsvReader(fileReader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false}))
+                {
+                     transactions = csvReader.GetRecords<Transaction>().ToList();
+                }
 
                 Console.Write("Would you like to (D)eposit, (W)ithdraw, or check (B)alance? ");
                 userInput = Console.ReadLine().ToUpper();
@@ -69,6 +70,18 @@ namespace FirstBankOfSuncoast
                     userInput = Console.ReadLine();
 
                     amountToTransact = int.Parse(userInput);
+
+
+                    try
+                    {
+                        amountToTransact = int.Parse(userInput);
+                    }
+                    catch (Exception e)
+
+                    {
+                        Console.WriteLine(e);
+                        continue;
+                    }
 
                     if (amountToTransact < 0)
                     {
@@ -123,23 +136,18 @@ namespace FirstBankOfSuncoast
                 }
 
 
-                // // Create a stream for writing information into a file
-                // var fileWriter = new StreamWriter(CHECKING_ACCOUNT);
-
-                // // Create an object that can write CSV to the fileWriter
-                // var csvWriter = new CsvWriter(fileWriter, CultureInfo.InvariantCulture);
-                // // write transactions to checking.csv 
-                // // Ask our csvWriter to write out our list of numbers
-                // csvWriter.WriteRecords(checkingTransactions);
-                // // Tell the file we are done
-                // fileWriter.Close();
-
+              using (var fileWriter = new StreamWriter(account))
+              using (var csvWriter = new CsvWriter(fileWriter, new CsvConfiguration(CultureInfo.InvariantCulture){ HasHeaderRecord = false}))
+              {
+                  csvWriter.WriteRecords(transactions);
+              }
 
                 Console.Write("Would you like to make another transaction? Y/N ");
                 userInput = Console.ReadLine().ToUpper();
                 if (userInput == "N")
                 {
                     keepGoing = false;
+                    Console.Write("Thank you, see you next time.");
                 }
             }
 
@@ -162,6 +170,10 @@ namespace FirstBankOfSuncoast
             }
             return sum;
 
+        }
+        public static void ShowTransactionHistory(List<Transaction> transactions)
+        {
+            transactions.ForEach(x => Console.WriteLine($"{x.Action}, {x.Amount}"));
         }
     }
 
